@@ -1,58 +1,197 @@
-<!DOCTYPE html>
+<!-- destruction is not in the face of misery and misery is not in the face of destruction -->
 <html>
+	<head>
+		<style type="text/css">
+			#text {
+				width:900px;
+				margin-left:auto;
+				margin-right:auto;
+				margin-top:100px;
+			}
+			.button {
+			    background-color: #4CAF50; /* Green */
+			    border: none;
+			    color: white;
+			    padding: 15px 32px;
+			    text-align: center;
+			    text-decoration: none;
+			    display: inline-block;
+			    font-size: 16px;
+			    cursor: pointer;
+			}
+			.button_done {
+			    background-color: #0099ff; /* Green */
+			    border: none;
+			    color: white;
+			    padding: 15px 32px;
+			    text-align: center;
+			    text-decoration: none;
+			    display: inline-block;
+			    font-size: 16px;
+			    cursor: pointer;
+			}
+			.button_red {
+			    background-color: #ff6699; /* Green */
+			    border: none;
+			    color: white;
+			    padding: 15px 32px;
+			    text-align: center;
+			    text-decoration: none;
+			    display: inline-block;
+			    font-size: 16px;
+			    cursor: pointer;
+			}
+			textarea {
+			    resize: none;
+			}
+		</style>
+	</head>
 
-<head>
-    <title>MutualFriends Dataset Browser</title>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" type="text/css" href="css/my.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="js/my.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-</head>
+	<body>
 
-<body>
+		<div id="text" style="text-align:center;">
+			<!--<h1 style="text-align:center;">Agent</h1>-->
+			</br></br>
+			<div style="display:none;">
+				worker_id: <div id="worker_id">{{worker_id}}</div>
+				assignment_id: <div id="assignment_id">{{assignment_id}}</div>
+				task: <div id="task">{{task}}</div>
+				condition: <div id="condition">{{condition}}</div>
+			</div>
+			<center style="color:gray;font-size:130%;">Your task is to instruct the following command</center>
+			<div><span style="color:red;font-size:150%;"><span style="font-size:200%;">"</span>{{task}}<span style="font-size:200%;">"</span></span></div></br></br>
+			<hr>
+			<div id="agent_message"><strong style="font-size:120%;">Phone:</strong> <span style="font-size:110%;">Hi, I don't understand the above command. Can you please break it for me step-by-step?</span></br></div></br>
 
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">MutualFriends Dataset</a>
-    </div>
-    <ul class="nav navbar-nav">
-      <li class="active"><a href="https://stanfordnlp.github.io/cocoa/">Home</a></li>
-    </ul>
-  </div>
-</nav>
+			<div id="input_div">
+				<strong style="font-size:120%;">You: </strong>&nbsp&nbsp<textarea id="chat_input" style="width:500px;"></textarea></br></br>
+				<button class="button" id="input_button" onclick="send_message(document.getElementById('chat_input').value);">Say</button>
+				<button class="button_done" id="done_button" style="display:none;" onclick="document.getElementById('main_form').submit();">Done</button>
+			</div>
 
-<div class="container">
-    <div class="panel-group">
-    <div class="panel panel-default" id="metadata-wrapper">
-        <div class="panel-body">
-        <table id="metadata" class="display" width="100%" cellspacing="0"></table>
-        </div>
-    </div>
-    <div class="panel panel-default" id="example-wrapper">
-        <div class="panel-body">
-        <div id="example" width="100%"></div> 
-        </div>
-    </div>
+				
+			<div id="waiting_msg" style="display:none;">Please wait....</div>
+			<div id="selection_div" style="display:none;">
+				<div style="color:gray;font-size:130%;">Please select the correct interpretation of the next step (or press "None are correct")</div></br>
+				<select id="responses" size="10" style="width:1000px;font-size:120%;">
+					<option value="0" id="option__0"></option>
+					<option value="1" id="option__1"></option>
+					<option value="2" id="option__2"></option>
+					<option value="3" id="option__3"></option>
+					<option value="4" id="option__4"></option>
+					<option value="5" id="option__5"></option>
+				</select></br></br>
+				<button class ="button" id="make_selection" onclick="make_selection();">Select</button>&nbsp
+				<button class ="button_red" id="no_selection" onclick="no_selection();">None are correct</button>
+			</div>
+			
+				<form id="main_form" method="POST" action="" style="text-align:center;display:none;">
+					<input type="text" name="command" style="width:600px;"> 	
+					<input type="submit"  name="sbt"        value="Accept">
+				</form>
+		</div>
+		
+	</body>
+	<script>
+		var worker_id     = document.getElementById("worker_id").textContent;
+		var assignment_id = document.getElementById("assignment_id").textContent;
+		var task          = document.getElementById("task").textContent;
+		var condition     = document.getElementById("condition").textContent;
+		MAX_RESPONSE = 5
+		function clear_selection() {
+		     for (var i=0; i <= MAX_RESPONSE ; i++) {
+			document.getElementById("option__"+i).selected= false;
+		     }
+		}
+		function clear_input() {
+			document.getElementById("chat_input").value = "";
+		}
+		window.onload = function() {
+		   document.getElementById('chat_input').onkeypress = function(e) {
+		       doClick(e);
+		   };
+		};
+		function doClick(e) {
+		  var ev = e || window.event;
+		  var key = ev.keyCode;
 
-    <div class="panel panel-default" id="filter">
-        <div class="panel-body">
-            <button id="redButton" type="button" class="red_button"></button> 
-            <button id="greenButton" type="button" class="green_button"></button> 
-            <button id="blueButton" type="button" class="blue_button"></button>  
-            <button id="yellowButton" type="button" class="yellow_button"></button>  
-            <button id="magentaButton" type="button" class="magenta_button"></button>  
-            <button id="silverButton" type="button" class="silver_button"></button>  
-            <button id="purpleButton" type="button" class="purple_button"></button>
-            <button id="maroonButton" type="button" class="maroon_button"></button>  
-    </div>
-    </div>
+		  if (key == 13)
+		  {
+		     var btn = document.getElementById('input_button');
+		     if (btn != null)
+		     { 
+			btn.click();
+			ev.preventDefault(); 
+		     }
+		  }
+	        }
+		function send_message(msg) {
+			console.log(msg)
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+			  if (this.readyState == 4 && this.status == 200) {
+			     response = this.responseText;
+			     console.log(response);
+			     response_list = JSON.parse(response);
+		    	     //for (var i=0; i < response_list.length; i++) {
+		    	     for (var i=0; i <= MAX_RESPONSE ; i++) {
+				document.getElementById("option__"+i).textContent = response_list[i].expression
+			     }
+		             document.getElementById("waiting_msg").style.display = "none";
+			     document.getElementById("selection_div").style.display = "block";
+			     document.getElementById("input_button").style.visibility = "hidden";
+			     document.getElementById("chat_input").disabled = true;
+			     document.getElementById("agent_message").style.visibility = "hidden";
+			  }
+			};
+			document.getElementById("waiting_msg").style.display = "block"
+			xhttp.open("GET", "send_command?msg="+msg+"&worker_id="+worker_id+"&assignment_id="+assignment_id+"&task="+task+"&condition="+condition, true);
+			xhttp.send();
+		}
+		function ajax_selection(selection) {
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+			  if (this.readyState == 4 && this.status == 200) {
+			     response = this.responseText;
+			     console.log(response);
+		             //document.getElementById("waiting_msg").style.display = "none";
+			     document.getElementById("selection_div").style.display   = "none";
+			     document.getElementById("input_button").style.visibility = "visible";
+			     document.getElementById("chat_input").disabled           = false;
+			     document.getElementById("chat_input").focus();
+			     if (selection > -1) {
+				     document.getElementById("agent_message").innerHTML ='<strong style="font-size:120%;">Phone:</strong> <span style="font-size:110%;">OK! What is the next step (or press DONE when done)</span></br>';
+			     }
+			     else {
+				     document.getElementById("agent_message").innerHTML ='<strong style="font-size:120%;">Phone:</strong> <span style="font-size:110%;">Hmm, can you please rephrase my next step, so that I can understand it?</span></br>';
+			     }
+			     document.getElementById("agent_message").style.visibility = "visible";
+			     document.getElementById("done_button").style.display = "inline";
 
-    </div> <!-- panel group -->
-</div> <!-- container -->
-</body>
-
+			     clear_selection();
+			     clear_input();
+			  }
+			};
+			xhttp.open("GET", "make_selection?selection="+selection+"&worker_id="+worker_id+"&assignment_id="+assignment_id, true);
+			xhttp.send();
+		}
+		function no_selection() {
+			ajax_selection(-1)
+		}
+		function make_selection() {
+		       selection = -2;
+		       for (var i=0 ; i <= MAX_RESPONSE; i++) {
+			  if (document.getElementById("option__"+i).selected) {
+				selection = i
+				break;
+			   }
+		        }
+			if (selection==-2) {
+				alert("You have not made a selection!")
+			}
+			else {
+				ajax_selection(selection)
+			}
+		}
+	</script>
 </html>
