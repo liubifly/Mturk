@@ -1,8 +1,5 @@
 $(document).ready(function() {
     $(function(){
-        // $.getJSON('../metadata.json', function (data) {
-            $('#example').load('../chat_htmls/' + 'C_0a0a50cbadc24893acf19f4b67c251d3' + '.html');
-
             $('button').click(function() { 
                 sel = window.getSelection();
                 if (sel.rangeCount && sel.getRangeAt) {
@@ -20,7 +17,5 @@ $(document).ready(function() {
                 // Set design mode to off
                 document.designMode = "off";  
             });
-
-        // } );
     });
 } );
