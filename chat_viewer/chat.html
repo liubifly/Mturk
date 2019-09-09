@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
-<!-- <script src="https://assets.crowd.aws/crowd-html-elements.js"></script> -->
-<!-- <crowd-form answer-format="flatten-objects"> -->
+<script src="https://assets.crowd.aws/crowd-html-elements.js"></script>
 <head>
     <title>MutualFriends Dataset Browser</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
@@ -9,14 +8,13 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
-    <!-- <script type="text/javascript" src="https://bifei-mturk-repo.s3.amazonaws.com/train-viz/chat_viewer/js/my.js"></script> -->
-    <script type="text/javascript" src="js/my.js"></script>
+    <script type="text/javascript" src="https://bifei-mturk-repo.s3.amazonaws.com/train-viz/chat_viewer/js/my.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/csi.min.js"></script>
 </head>
 
+<crowd-form answer-format="flatten-objects">
 <body>
-
 <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -44,12 +42,12 @@
     </div>
     <div class="panel panel-default" id="example-wrapper">
         <div class="panel-body">
-        <div id="example" width="100%" data-include="https://bifei-mturk-repo.s3.amazonaws.com/train-viz/chat_htmls/C_0015260dcf1b402993abcd861baf96ad.html">
+        <div id="example" width="100%" data-include="${chat_src}">
+        <!-- <div id="example" width="100%" data-include="https://bifei-mturk-repo.s3.amazonaws.com/train-viz/chat_htmls/C_000e486946794502a442d99a32458924.html"> -->
         <!-- <div data-include="../chat_htmls/C_0a0a50cbadc24893acf19f4b67c251d3.html"></div> -->
         </div> 
         </div>
     </div>
-
 
     <div class="panel panel-default" id="filter">
         <div class="panel-body">
@@ -68,5 +66,6 @@
     </div> <!-- panel group -->
 </div> <!-- container -->
 </body>
-<!-- </crowd-form> -->
+</crowd-form>
+
 </html>
